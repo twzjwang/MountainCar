@@ -2,9 +2,14 @@ import numpy as np
 import random
 import pandas as pd
 import gym
+import matplotlib.pyplot as plt
 
 def toPos(x, y):
     return int((y + 0.1) / 0.2 * 100) * 100 + int((x + 1.5) / 2.5 * 100)
+
+plt.ylabel('Reward')
+plt.xlabel('Timesteps')
+plt.title('Tearning curve')
 
 env = gym.make('MountainCar-v0')
 Q = np.zeros([100 * 100, env.action_space.n])
@@ -22,12 +27,14 @@ for i in range(30000):
         Q[pos, action] = new_reward + Q[pos, action] + np.max(Q[new_pos, :]) - Q[pos, action]
         reward_sum += new_reward
         pos = new_pos
-        if i % 5000 == 0:
+        if i % 3000 == 0:
             env.render()
         if done:
             break
-    if i % 100 == 0:
+    if i % 200 == 0 and i > 0:
         mean = record.mean()
         print(i, mean)
+        plt.plot(i, mean, 'r.')
     else:
         record[i % 100] = reward_sum
+plt.show()
